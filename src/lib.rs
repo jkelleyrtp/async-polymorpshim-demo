@@ -1,10 +1,5 @@
 use std::future::Future;
 
-/// A trait that lets us do something with the fn itself
-trait AnyFn {
-    fn call(self, scope: &Scope) -> SuspenseMode;
-}
-
 struct Scope;
 
 impl Scope {
@@ -29,6 +24,7 @@ enum SuspenseMode<'a> {
     Sync(&'a Element<'a>),
     Async(Box<dyn Future<Output = Element<'a>> + 'a>),
 }
+
 impl<'a, F> ReturnType<'a> for F
 where
     F: Future<Output = Element<'a>> + 'a,
@@ -38,13 +34,7 @@ where
     }
 }
 
-impl<'a, F: ReturnType<'a>> AnyFn for fn(&'a Scope) -> F {
-    fn call(self, scope: &Scope) -> SuspenseMode {
-        todo!()
-    }
-}
-
-fn it_goes(f: impl AnyFn) {}
+fn it_goes<'a, F: ReturnType<'a>>(f: fn(&'a Scope) -> F) {}
 
 fn example(cx: &Scope) -> Element {
     todo!()
@@ -55,6 +45,6 @@ async fn example2(cx: &Scope) -> Element {
 }
 
 fn does_it_work() {
-    it_goes(example as fn(_) -> _);
-    it_goes(example2 as fn(_) -> _);
+    it_goes(example);
+    it_goes(example2);
 }

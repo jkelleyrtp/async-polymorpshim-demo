@@ -12,27 +12,26 @@ impl Scope {
         todo!()
     }
 }
-struct Element;
 
-trait ReturnType<'a, M = ()> {
+struct Element<'a>(&'a str);
+
+trait ReturnType<'a> {
     fn alloc(self, scope: &'a Scope) -> SuspenseMode<'a>;
 }
 
-struct AsyncMarker;
-
-impl<'a> ReturnType<'a> for Element {
+impl<'a> ReturnType<'a> for Element<'a> {
     fn alloc(self, scope: &'a Scope) -> SuspenseMode<'a> {
         SuspenseMode::Sync(scope.alloc(self))
     }
 }
 
 enum SuspenseMode<'a> {
-    Sync(&'a Element),
-    Async(Box<dyn Future<Output = Element> + 'a>),
+    Sync(&'a Element<'a>),
+    Async(Box<dyn Future<Output = Element<'a>> + 'a>),
 }
 impl<'a, F> ReturnType<'a> for F
 where
-    F: Future<Output = Element> + 'a,
+    F: Future<Output = Element<'a>> + 'a,
 {
     fn alloc(self, scope: &'a Scope) -> SuspenseMode<'a> {
         SuspenseMode::Async(Box::new(self))
@@ -48,11 +47,11 @@ impl<'a, F: ReturnType<'a>> AnyFn for fn(&'a Scope) -> F {
 fn it_goes(f: impl AnyFn) {}
 
 fn example(cx: &Scope) -> Element {
-    Element
+    todo!()
 }
 
 async fn example2(cx: &Scope) -> Element {
-    Element
+    todo!()
 }
 
 fn does_it_work() {
